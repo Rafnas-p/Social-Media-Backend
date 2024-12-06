@@ -2,6 +2,7 @@ import express, { Application } from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import videoRoutes from './routes/videoRoutes';
+import commentRoutes from "./routes/commentRoutes"
 const cors = require('cors');
 
 
@@ -18,8 +19,9 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(express.json());
 
-
+app.use(express.urlencoded({ extended: true }));
 // MongoDB connection
 const MONGODB_URL = process.env.MONGODB_URL as string;
 mongoose
@@ -28,7 +30,7 @@ mongoose
   .catch((err: Error) => console.error('MongoDB connection error:', err));
 
 app.use('/api', videoRoutes);
-
+app.use('/api',commentRoutes)
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
