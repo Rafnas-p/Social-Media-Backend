@@ -64,7 +64,6 @@ export const getEntairShorts = async (req: Request, res: Response) => {
 export const getVideoById = async (req: Request, res: Response) => {
   try {
    const{videoId}= req.params;
-   console.log('0',videoId);
    
       const video=await Video.findById(videoId)
       res.status(200).json(video );
@@ -73,5 +72,62 @@ export const getVideoById = async (req: Request, res: Response) => {
   } catch (error:any) {
     console.error("error fetching One video:", error.message);
     res.status(500).json({ error: error.message || "Failed to fetch Shorts" });
+  }
+};
+
+export const getShortsById = async (req: Request, res: Response) => {
+  try {
+    const { shortsId } = req.params;
+
+    // Fetch the Shorts video by its ID
+    const shorts = await Shorts.findById(shortsId);
+
+    if (!shorts) {
+       res.status(404).json({ message: "Shorts not found" });
+    }
+
+    res.status(200).json(shorts);
+  } catch (error: any) {
+    console.error("Error fetching Shorts video:", error.message);
+    res.status(500).json({ error: error.message || "Failed to fetch Shorts video" });
+  }
+};
+
+export const UpdateVideoByID = async (req: Request, res: Response) => {
+  try {
+    const { title, description } = req.body;
+    const { videoId } = req.params; // Correct parameter name
+    const updatedVideo = await Video.findByIdAndUpdate(
+      videoId,
+      { title, description },
+      { new: true } // Return the updated document
+    );
+    if (!updatedVideo) {
+    res.status(404).json({ message: "Video not found" });
+    }
+    res.json(updatedVideo);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+export const UpdateShortsByID = async (req: Request, res: Response) => {
+  try {
+    const { title, description } = req.body; // Extract fields from the request body
+    const { shortsId } = req.params; // Extract the shorts ID from the request parameters
+
+    const updatedShorts = await Shorts.findByIdAndUpdate(
+      shortsId,
+      { title, description },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedShorts) {
+       res.status(404).json({ message: "Shorts not found" });
+    }
+
+    res.json(updatedShorts);
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
   }
 };
