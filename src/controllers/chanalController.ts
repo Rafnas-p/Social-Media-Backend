@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import Video from "../models/Video";
 import Shorts from "../models/Shorts";
-import { log } from "console";
 
 export const getAllVideos = async (req: Request, res: Response) => {
   try {
@@ -41,8 +40,8 @@ export const getAllShorts = async (req: Request, res: Response) => {
 
 export const getEntairVideos = async (req: Request, res: Response) => {
   try {
-    const videos = await Video.find(); // Fetch videos
-    res.status(200).json({ videos }); // Return as `videos` key
+    const videos = await Video.find(); 
+    res.status(200).json({ videos }); 
   } catch (error: any) {
     console.error("Error fetching videos:", error.message);
     res.status(500).json({ error: "Failed to fetch videos" });
@@ -52,7 +51,7 @@ export const getEntairVideos = async (req: Request, res: Response) => {
 
 export const getEntairShorts = async (req: Request, res: Response) => {
   try {
-    const shorts = await Shorts.find(); // Fetch all shorts from the database
+    const shorts = await Shorts.find(); 
     res.status(200).json({ success: true, shorts });
   } catch (error: any) {
     console.error("Error fetching shorts:", error.message);
@@ -79,7 +78,6 @@ export const getShortsById = async (req: Request, res: Response) => {
   try {
     const { shortsId } = req.params;
 
-    // Fetch the Shorts video by its ID
     const shorts = await Shorts.findById(shortsId);
 
     if (!shorts) {
@@ -96,11 +94,11 @@ export const getShortsById = async (req: Request, res: Response) => {
 export const UpdateVideoByID = async (req: Request, res: Response) => {
   try {
     const { title, description } = req.body;
-    const { videoId } = req.params; // Correct parameter name
+    const { videoId } = req.params; 
     const updatedVideo = await Video.findByIdAndUpdate(
       videoId,
       { title, description },
-      { new: true } // Return the updated document
+      { new: true }
     );
     if (!updatedVideo) {
     res.status(404).json({ message: "Video not found" });
@@ -113,13 +111,13 @@ export const UpdateVideoByID = async (req: Request, res: Response) => {
 
 export const UpdateShortsByID = async (req: Request, res: Response) => {
   try {
-    const { title, description } = req.body; // Extract fields from the request body
-    const { shortsId } = req.params; // Extract the shorts ID from the request parameters
+    const { title, description } = req.body; 
+    const { shortsId } = req.params; 
 
     const updatedShorts = await Shorts.findByIdAndUpdate(
       shortsId,
       { title, description },
-      { new: true } // Return the updated document
+      { new: true } 
     );
 
     if (!updatedShorts) {

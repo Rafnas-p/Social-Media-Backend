@@ -6,23 +6,23 @@ const replySchema = new mongoose.Schema(
     userName: { type: String, required: true },
     userProfile: { type: String, required: true },
     text: { type: String, required: true },
-    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Users who liked the reply
-    dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Users who disliked the reply
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], 
+    dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
     createdAt: { type: Date, default: Date.now },
   },
-  { _id: false } // Replies are embedded and don't need separate _id
+  { _id: false } 
 );
 
 const commentSchema = new mongoose.Schema(
   {
-    videoId: { type: mongoose.Schema.Types.ObjectId, ref: "Video", required: true }, // ID of the video or post
+    videoId: { type: mongoose.Schema.Types.ObjectId, ref: "Video", required: true }, 
     userId: { type: String, required: true },
     userName: { type: String, required: true },
     userProfile: { type: String, required: true },
     text: { type: String, required: true },
-    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Users who liked the comment
-    dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // Users who disliked the comment
-    replies: [replySchema], // Array of replies
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], 
+    dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], 
+    replies: [replySchema], 
     createdAt: { type: Date, default: Date.now },
   },
   { timestamps: true }

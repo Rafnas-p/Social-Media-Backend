@@ -5,7 +5,7 @@ import path from "path";
 import fs from "fs";
 import { uploadVideo } from "../Cloudnary/config";
 import Video from "../models/Video";
-import Shorts from "../models/Shorts"; // Import Shorts schema
+import Shorts from "../models/Shorts";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

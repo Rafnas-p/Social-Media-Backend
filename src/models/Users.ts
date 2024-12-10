@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true },
   displayName: { type: String, required: true },
   photoURL: { type: String },
-  userId: { type: String, required: true }, // Reference to User
+  userId: { type: String, required: true }, 
 
   channelName: { type: String, required: false },
   createdAt: { type: Date, default: Date.now },
