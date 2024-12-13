@@ -91,3 +91,7 @@ export const uploadVideoToCloudinary = async (
       .json({ message: "Internal server error", error: error.message });
   }
 };
+
+export const likeVideo =async (req:Request,res:Response)=>{
+
+}

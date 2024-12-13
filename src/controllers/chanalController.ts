@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import Video from "../models/Video";
 import Shorts from "../models/Shorts";
-
+import Channel from "../models/Channel";
+import User from "../models/Users";
 export const getAllVideos = async (req: Request, res: Response) => {
   try {
     const { userId } = req.query;
@@ -129,3 +130,41 @@ export const UpdateShortsByID = async (req: Request, res: Response) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+ export const createChannel =async (req: Request, res: Response)=>{
+  const { name, ownerId } = req.body;
+
+  if (!name || !ownerId) {
+   res.status(400).json({ message: 'Name and ownerId are required.' });
+  }
+ 
+  
+  try {
+
+    const channelId = await User.findById(ownerId);
+    if (!channelId) {
+      res.status(404).json({ message: 'Owner not found.' });
+    }
+
+    const existingChannel = await Channel.findOne({ name, channelId: ownerId });
+    if (existingChannel) {
+      res.status(400).json({ message: 'Channel with the same name already exists.' });
+    }
+    const channel = new Channel({
+      name,
+      channelId: ownerId,
+    });
+
+    await channel.save();
+
+    res.status(201).json({
+      message: 'Channel created successfully!',
+      channel,
+    });
+ } catch (error:any) {
+  console.error(error);
+    res.status(500).json({ message: 'Internal server error.', error });
+ }
+  
+ }

@@ -6,8 +6,9 @@ const userSchema = new mongoose.Schema({
   displayName: { type: String, required: true },
   photoURL: { type: String },
   userId: { type: String, required: true }, 
-
-  channelName: { type: String, required: false },
+  subscribedChannels: [
+    { type: mongoose.Schema.Types.ObjectId, ref: 'Channel' }, 
+  ],
   createdAt: { type: Date, default: Date.now },
 });
 

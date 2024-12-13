@@ -10,6 +10,8 @@ export interface IVideo extends Document {
   title:string | number
  profil:string;
  userName:string
+ likes:string| number
+ dislikes:string | number
 }
 
 const videoSchema: Schema = new Schema<IVideo>({
@@ -19,6 +21,8 @@ const videoSchema: Schema = new Schema<IVideo>({
   createdAt: { type: Date, default: Date.now },
   userId: { type: String, required: true }, 
   profil: { type: String }, 
+  likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], 
+  dislikes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], 
   userName:{type:String},
   duration:{type:Number, required: true },
   title:{type:String,required:true},
