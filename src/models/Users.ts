@@ -5,12 +5,13 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true },
   displayName: { type: String, required: true },
   photoURL: { type: String },
-  userId: { type: String, required: true }, 
+  userId: { type: String, required: true },
   subscribedChannels: [
     { type: mongoose.Schema.Types.ObjectId, ref: 'Channel' }, 
   ],
   createdAt: { type: Date, default: Date.now },
 });
+
 
 const User = mongoose.model('User', userSchema);
 

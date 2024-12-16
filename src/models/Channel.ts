@@ -2,15 +2,19 @@ import mongoose, { Schema, Document, Types } from 'mongoose';
 
 interface ChannelDocument extends Document {
   name: string;
-  channelId: Types.ObjectId;
+  uid:string;
   subscribers: Types.ObjectId[];
   totalSubscribers: number;
+  photoURL:string
+  handil:string
 }
 
-const ChannelSchema = new Schema<ChannelDocument>({
+const ChannelSchema = new Schema({
   name: { type: String, required: true },
-  channelId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  subscribers: [{ type: String }], // Store user IDs as strings
+  uid: { type: String, ref: 'User', required: true }, 
+  subscribers: [{ type: String }],
+  photoURL: { type: String },
+  handil: { type: String },
   totalSubscribers: { type: Number, default: 0 },
 });
 

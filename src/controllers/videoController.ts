@@ -6,6 +6,7 @@ import fs from "fs";
 import { uploadVideo } from "../Cloudnary/config";
 import Video from "../models/Video";
 import Shorts from "../models/Shorts";
+import User from "../models/Users";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -92,6 +93,81 @@ export const uploadVideoToCloudinary = async (
   }
 };
 
-export const likeVideo =async (req:Request,res:Response)=>{
 
-}
+
+
+export const likeVideo = async (req: Request, res: Response) => {
+  const { _id, uid } = req.body;
+
+  if (!_id || !uid) {
+    res.status(400).json({ message: "User ID and Video ID are required" });
+    return;
+  }
+
+  try {
+    const video = await Video.findById(_id);
+
+    if (!video) {
+      res.status(404).json({ message: "Video not found" });
+      return;
+    }
+
+    if (video.likes.includes(uid)) {
+      // User already liked the video, so remove the like
+      video.likes = video.likes.filter((userId) => userId !== uid);
+      await video.save();
+
+      res.status(200).json({
+        message: "Like removed successfully",
+        likesCount: video.likes.length,
+      });
+      return;
+    }
+
+    // Add a like
+    video.likes.push(uid);
+    await video.save();
+
+    res.status(200).json({
+      message: "Video liked successfully",
+      likesCount: video.likes.length,
+    });
+
+  } catch (error: any) {
+    console.error("Error toggling like:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+};
+
+
+export const dislikeVideo = async (req: Request, res: Response) => {
+  const { _id, uid } = req.body;
+
+  if (!_id || !uid) {
+    res.status(400).json({ message: "User ID and Video ID are required" });
+    return;
+  }
+
+  try {
+    const video = await Video.findById(_id);
+
+    if (!video) {
+      res.status(404).json({ message: "Video not found" });
+      return;
+    }
+
+    if (video.likes.includes(uid)) {
+      video.likes= video.likes.filter((userId) => userId !== uid);
+      await video.save();
+
+      res.status(200).json({
+        message: "Dislike removed successfully",
+        dislikesCount: video.dislikes.length,
+      });
+    } 
+  } catch (error:any) {
+    console.error("Error disliking video:", error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+};
+

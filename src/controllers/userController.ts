@@ -16,6 +16,7 @@ export  const CreatUser=async(req:Request,res:Response)=>{
       }
     };
 
+
     
     export const getAllUsers = async (req: Request, res: Response) => {
       try {
@@ -35,7 +36,7 @@ export  const CreatUser=async(req:Request,res:Response)=>{
     
       if (!channelId || !uid) {
         res.status(400).json({ message: 'Channel ID and User ID are required' });
-        return; // Terminate execution
+        return;
       }
     
       try {

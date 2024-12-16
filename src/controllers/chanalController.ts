@@ -3,6 +3,11 @@ import Video from "../models/Video";
 import Shorts from "../models/Shorts";
 import Channel from "../models/Channel";
 import User from "../models/Users";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+import { uploadImage } from "../Cloudnary/uploadimag";
+
 export const getAllVideos = async (req: Request, res: Response) => {
   try {
     const { userId } = req.query;
@@ -132,28 +137,58 @@ export const UpdateShortsByID = async (req: Request, res: Response) => {
 };
 
 
- export const createChannel =async (req: Request, res: Response)=>{
-  const { name, ownerId } = req.body;
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = path.join(__dirname, '../../profile/images');
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${Date.now()}${path.extname(file.originalname)}`);
+  },
+});
+
+const upload = multer({ storage });
+export const imageUpload = upload.single('image');
+
+export const createChannel = async (req: Request, res: Response): Promise<void> => {
+  const { name, ownerId, handil } = req.body;
 
   if (!name || !ownerId) {
-   res.status(400).json({ message: 'Name and ownerId are required.' });
+    res.status(400).json({ message: 'Name and ownerId are required.' });
+    return;
   }
- 
-  
-  try {
 
-    const channelId = await User.findById(ownerId);
-    if (!channelId) {
+  try {
+    const owner = await User.findOne({ uid: ownerId });
+    if (!owner) {
       res.status(404).json({ message: 'Owner not found.' });
+      return;
     }
 
-    const existingChannel = await Channel.findOne({ name, channelId: ownerId });
+    const existingChannel = await Channel.findOne({ name, uid: ownerId });
     if (existingChannel) {
       res.status(400).json({ message: 'Channel with the same name already exists.' });
+      return;
     }
+
+    let photoURL = '';
+
+    if (req.file) {
+      const filePath = req.file.path;
+      const uploadResult = await uploadImage(filePath);
+      photoURL = uploadResult.secure_url;
+      fs.unlinkSync(filePath); // Delete local file after upload
+    }
+
     const channel = new Channel({
       name,
-      channelId: ownerId,
+      uid: ownerId,
+      photoURL,
+      handil,
     });
 
     await channel.save();
@@ -162,9 +197,54 @@ export const UpdateShortsByID = async (req: Request, res: Response) => {
       message: 'Channel created successfully!',
       channel,
     });
- } catch (error:any) {
-  console.error(error);
+  } catch (error: any) {
+    console.error(error);
     res.status(500).json({ message: 'Internal server error.', error });
- }
-  
- }
+  }
+};
+
+export const getChannels = async (req: Request, res: Response): Promise<void> => {
+  const { ownerId } = req.query;
+
+  if (!ownerId) {
+    res.status(400).json({ message: 'ownerId is required.' });
+    return;
+  }
+
+  try {
+    const channels = await Channel.findOne({ uid: ownerId });
+    if (!channels) {
+      res.status(404).json({ message: 'No channels found for this user.' });
+      return;
+    }
+
+    res.status(200).json(channels);
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error.', error });
+  }
+};
+
+
+export const getChannelsByName= async (req: Request, res: Response): Promise<void> => {
+  const { userName } = req.query;
+
+  if (!userName) {
+    res.status(400).json({ message: 'ownerId is required.' });
+    return;
+  }
+
+  try {
+    const channels = await Channel.find({ name: userName });
+    if (!channels) {
+      res.status(404).json({ message: 'No channels found for this user.' });
+      return;
+    }
+
+    res.status(200).json(channels);
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal server error.', error });
+  }
+};
+

@@ -1,6 +1,6 @@
 import express from 'express';
-import { videoUpload, uploadVideoToCloudinary } from '../controllers/videoController';
-import{getAllShorts, getAllVideos,getEntairVideos,getVideoById,getEntairShorts,UpdateVideoByID, UpdateShortsByID, getShortsById, createChannel}from "../controllers/chanalController"
+import { videoUpload, uploadVideoToCloudinary, likeVideo, dislikeVideo } from '../controllers/videoController';
+import{getAllShorts, getAllVideos,getEntairVideos,getVideoById,getEntairShorts,UpdateVideoByID, UpdateShortsByID, getShortsById, createChannel, imageUpload, getChannels, getChannelsByName}from "../controllers/chanalController"
 import { CreatUser,getAllUsers, subscriberChannel, unSubscribeChannel} from '../controllers/userController';
 const router = express.Router();
 
@@ -16,7 +16,11 @@ router.get('/getallusers',getAllUsers)
 router.put('/updateVideoDetails/:videoId', UpdateVideoByID);
 router.put('/updateShortsDetails/:shortsId', UpdateShortsByID);
 router.get("/short/:shortsId", getShortsById);
-router.post("/create-channel",createChannel)
+router.post('/create-channel', imageUpload, createChannel);
 router.post('/subscribChannel',subscriberChannel)
 router.post('/unsubscriberChannel',unSubscribeChannel)
+router.post('/likeVideo',likeVideo)
+router.post('/dislikeVideo',dislikeVideo)
+router.get("/getchannel",getChannels)
+router.get("/getChannelsByName",getChannelsByName)
 export default router;
