@@ -34,9 +34,9 @@ export const uploadVideoToCloudinary = async (
       return;
     }
 
-    const { description, userId, title, category ,profil,userName } = req.body;
+    const { description, uid, title, category ,profil,userName } = req.body;
 
-    if (!userId || !description) {
+    if (!uid || !description) {
       res
         .status(400)
         .json({ message: "Missing required fields: userId or description" });
@@ -57,7 +57,7 @@ export const uploadVideoToCloudinary = async (
         videoUrl: result.secure_url,
         publicId: result.public_id,
         duration: result.duration,
-        userId,
+        uid,
         profil,
         userName,
         title,
@@ -71,7 +71,7 @@ export const uploadVideoToCloudinary = async (
         videoUrl: result.secure_url,
         publicId: result.public_id,
         duration: result.duration,
-        userId,
+        uid,
         profil,
         title,
         userName,
@@ -113,13 +113,14 @@ export const likeVideo = async (req: Request, res: Response) => {
     }
 
     if (video.likes.includes(uid)) {
-      // User already liked the video, so remove the like
       video.likes = video.likes.filter((userId) => userId !== uid);
       await video.save();
 
       res.status(200).json({
         message: "Like removed successfully",
         likesCount: video.likes.length,
+        likes:video.likes
+        
       });
       return;
     }
@@ -131,6 +132,7 @@ export const likeVideo = async (req: Request, res: Response) => {
     res.status(200).json({
       message: "Video liked successfully",
       likesCount: video.likes.length,
+      likes:video.likes
     });
 
   } catch (error: any) {
@@ -162,7 +164,8 @@ export const dislikeVideo = async (req: Request, res: Response) => {
 
       res.status(200).json({
         message: "Dislike removed successfully",
-        dislikesCount: video.dislikes.length,
+        likesCount: video.likes.length,
+        likes:video.likes
       });
     } 
   } catch (error:any) {

@@ -55,7 +55,6 @@ export const deleteComment = async (req: Request, res: Response): Promise<void> 
 export const getCommentsById = async (req: Request, res: Response) => {
   const { videoId } = req.params;
 
-  console.log("videoId",videoId)
   try {
     const comments = await Comments.find({ videoId });
 

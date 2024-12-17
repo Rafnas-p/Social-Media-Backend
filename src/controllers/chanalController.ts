@@ -10,14 +10,18 @@ import { uploadImage } from "../Cloudnary/uploadimag";
 
 export const getAllVideos = async (req: Request, res: Response) => {
   try {
-    const { userId } = req.query;
-  console.log("userID",userId);
+    const { uid } = req.query;
   
-    if (!userId) {
+    if (!uid) {
       throw new Error("Please logIn");
     }
-    const videos = await Video.find({ userId });
-    console.log("v1", videos);
+    const videos = await Video.find({ uid }).populate({
+      path: 'uid', // The field in the Video schema to populate
+      model: 'User',  // The referenced model
+      localField: 'uid', // The field in the Video schema
+      foreignField: 'uid',  // The field in the User schema
+      select: 'email displayName photoURL', // Fields to include in the populated data
+    });
 
     res.status(200).json({ videos });
   } catch (error: any) {
@@ -29,7 +33,6 @@ export const getAllVideos = async (req: Request, res: Response) => {
 export const getAllShorts = async (req: Request, res: Response) => {
   try {
     const { userId } = req.query;
-    console.log("shortId", userId);
 
     if (!userId) {
       throw new Error("please logIn");
@@ -44,15 +47,36 @@ export const getAllShorts = async (req: Request, res: Response) => {
   }
 };
 
+// export const getEntairVideos = async (req: Request, res: Response) => {
+//   try {
+//     const videos = await Video.find();
+//     res.status(200).json({ videos }); 
+//   } catch (error: any) {
+//     console.error("Error fetching videos:", error.message);
+//     res.status(500).json({ error: "Failed to fetch videos" });
+//   }
+// };
 export const getEntairVideos = async (req: Request, res: Response) => {
   try {
-    const videos = await Video.find(); 
-    res.status(200).json({ videos }); 
+    console.log('Fetching videos...');
+
+    // Use localField and foreignField to populate based on `uid`
+    const videos = await Video.find().populate({
+      path: 'uid', // The field in the Video schema to populate
+      model: 'User',  // The referenced model
+      localField: 'uid', // The field in the Video schema
+      foreignField: 'uid',  // The field in the User schema
+      select: 'email displayName photoURL', // Fields to include in the populated data
+    });
+
+    res.status(200).json({ videos });
   } catch (error: any) {
-    console.error("Error fetching videos:", error.message);
-    res.status(500).json({ error: "Failed to fetch videos" });
+    console.error('Error fetching videos:', error.message);
+    res.status(500).json({ error: 'Failed to fetch videos' });
   }
 };
+
+
 
 
 export const getEntairShorts = async (req: Request, res: Response) => {
@@ -70,7 +94,15 @@ export const getVideoById = async (req: Request, res: Response) => {
   try {
    const{videoId}= req.params;
    
-      const video=await Video.findById(videoId)
+      const video=await Video.findById(videoId).populate({
+        path: 'uid', // The field in the Video schema to populate
+        model: 'User',  // The referenced model
+        localField: 'uid', // The field in the Video schema
+        foreignField: 'uid',  // The field in the User schema
+        select: 'email displayName photoURL', // Fields to include in the populated data
+      });
+      console.log('Fetched videos:',video);
+
       res.status(200).json(video );
 
       
@@ -155,7 +187,7 @@ const upload = multer({ storage });
 export const imageUpload = upload.single('image');
 
 export const createChannel = async (req: Request, res: Response): Promise<void> => {
-  const { name, ownerId, handil } = req.body;
+  const { name, ownerId, handil,photoURL } = req.body;
 
   if (!name || !ownerId) {
     res.status(400).json({ message: 'Name and ownerId are required.' });
@@ -175,19 +207,19 @@ export const createChannel = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
-    let photoURL = '';
+    let profile=photoURL;
 
     if (req.file) {
       const filePath = req.file.path;
       const uploadResult = await uploadImage(filePath);
-      photoURL = uploadResult.secure_url;
+      profile = uploadResult.secure_url;
       fs.unlinkSync(filePath); // Delete local file after upload
     }
 
     const channel = new Channel({
       name,
       uid: ownerId,
-      photoURL,
+      profile,
       handil,
     });
 

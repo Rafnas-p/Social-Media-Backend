@@ -5,7 +5,7 @@ interface ChannelDocument extends Document {
   uid:string;
   subscribers: Types.ObjectId[];
   totalSubscribers: number;
-  photoURL:string
+  profile:string
   handil:string
 }
 
@@ -13,7 +13,7 @@ const ChannelSchema = new Schema({
   name: { type: String, required: true },
   uid: { type: String, ref: 'User', required: true }, 
   subscribers: [{ type: String }],
-  photoURL: { type: String },
+  profile: { type: String },
   handil: { type: String },
   totalSubscribers: { type: Number, default: 0 },
 });

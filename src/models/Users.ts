@@ -4,8 +4,8 @@ const userSchema = new mongoose.Schema({
   uid: { type: String, required: true, unique: true },
   email: { type: String, required: true },
   displayName: { type: String, required: true },
+  channelName:{type: String},
   photoURL: { type: String },
-  userId: { type: String, required: true },
   subscribedChannels: [
     { type: mongoose.Schema.Types.ObjectId, ref: 'Channel' }, 
   ],
