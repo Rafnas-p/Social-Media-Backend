@@ -10,18 +10,15 @@ import { uploadImage } from "../Cloudnary/uploadimag";
 
 export const getAllVideos = async (req: Request, res: Response) => {
   try {
-    const { uid } = req.query;
+    const { userId } = req.query;
+    console.log(req.query);
+    
   
-    if (!uid) {
+    if (!userId) {
       throw new Error("Please logIn");
     }
-    const videos = await Video.find({ uid }).populate({
-      path: 'uid', // The field in the Video schema to populate
-      model: 'User',  // The referenced model
-      localField: 'uid', // The field in the Video schema
-      foreignField: 'uid',  // The field in the User schema
-      select: 'email displayName photoURL', // Fields to include in the populated data
-    });
+    const videos = await Video.find({ userId }).populate('userId');
+console.log('getAllVideos',getAllVideos);
 
     res.status(200).json({ videos });
   } catch (error: any) {
@@ -29,6 +26,7 @@ export const getAllVideos = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message || "Failed to fetch videos." });
   }
 };
+
 
 export const getAllShorts = async (req: Request, res: Response) => {
   try {
@@ -38,7 +36,6 @@ export const getAllShorts = async (req: Request, res: Response) => {
       throw new Error("please logIn");
     }
     const shorts = await Shorts.find({ userId });
-    console.log("sort", shorts);
 
     res.status(200).json({ shorts });
   } catch (error: any) {
@@ -58,17 +55,11 @@ export const getAllShorts = async (req: Request, res: Response) => {
 // };
 export const getEntairVideos = async (req: Request, res: Response) => {
   try {
-    console.log('Fetching videos...');
 
-    // Use localField and foreignField to populate based on `uid`
-    const videos = await Video.find().populate({
-      path: 'uid', // The field in the Video schema to populate
-      model: 'User',  // The referenced model
-      localField: 'uid', // The field in the Video schema
-      foreignField: 'uid',  // The field in the User schema
-      select: 'email displayName photoURL', // Fields to include in the populated data
-    });
+    const videos = await Video.find().populate("userId")
 
+   
+    
     res.status(200).json({ videos });
   } catch (error: any) {
     console.error('Error fetching videos:', error.message);
@@ -92,17 +83,12 @@ export const getEntairShorts = async (req: Request, res: Response) => {
 
 export const getVideoById = async (req: Request, res: Response) => {
   try {
+    
    const{videoId}= req.params;
-   
-      const video=await Video.findById(videoId).populate({
-        path: 'uid', // The field in the Video schema to populate
-        model: 'User',  // The referenced model
-        localField: 'uid', // The field in the Video schema
-        foreignField: 'uid',  // The field in the User schema
-        select: 'email displayName photoURL', // Fields to include in the populated data
-      });
-      console.log('Fetched videos:',video);
 
+   
+   
+      const video=await Video.findById(videoId).populate("userId").populate("channelId")
       res.status(200).json(video );
 
       
@@ -187,21 +173,22 @@ const upload = multer({ storage });
 export const imageUpload = upload.single('image');
 
 export const createChannel = async (req: Request, res: Response): Promise<void> => {
-  const { name, ownerId, handil,photoURL } = req.body;
+  const { name, userId, handil,photoURL } = req.body;
 
-  if (!name || !ownerId) {
+  
+  if (!name || ! userId) {
     res.status(400).json({ message: 'Name and ownerId are required.' });
     return;
   }
-
+const _id=userId;
   try {
-    const owner = await User.findOne({ uid: ownerId });
+    const owner = await User.findOne({ _id });
     if (!owner) {
       res.status(404).json({ message: 'Owner not found.' });
       return;
     }
 
-    const existingChannel = await Channel.findOne({ name, uid: ownerId });
+    const existingChannel = await Channel.findOne({ name, userId: userId });
     if (existingChannel) {
       res.status(400).json({ message: 'Channel with the same name already exists.' });
       return;
@@ -218,7 +205,7 @@ export const createChannel = async (req: Request, res: Response): Promise<void> 
 
     const channel = new Channel({
       name,
-      uid: ownerId,
+      userId: userId,
       profile,
       handil,
     });
@@ -244,7 +231,7 @@ export const getChannels = async (req: Request, res: Response): Promise<void> =>
   }
 
   try {
-    const channels = await Channel.findOne({ uid: ownerId });
+    const channels = await Channel.findOne({ userId: ownerId });
     if (!channels) {
       res.status(404).json({ message: 'No channels found for this user.' });
       return;
@@ -265,9 +252,12 @@ export const getChannelsByName= async (req: Request, res: Response): Promise<voi
     res.status(400).json({ message: 'ownerId is required.' });
     return;
   }
+  
 
   try {
     const channels = await Channel.find({ name: userName });
+    console.log('channels',channels);
+    
     if (!channels) {
       res.status(404).json({ message: 'No channels found for this user.' });
       return;

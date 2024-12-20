@@ -7,6 +7,7 @@ import { uploadVideo } from "../Cloudnary/config";
 import Video from "../models/Video";
 import Shorts from "../models/Shorts";
 import User from "../models/Users";
+import { log } from "util";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -34,9 +35,9 @@ export const uploadVideoToCloudinary = async (
       return;
     }
 
-    const { description, uid, title, category ,profil,userName } = req.body;
+    const { description, userId, title, category ,profil,userName ,channelId} = req.body;
 
-    if (!uid || !description) {
+    if (!userId || !description) {
       res
         .status(400)
         .json({ message: "Missing required fields: userId or description" });
@@ -47,21 +48,22 @@ export const uploadVideoToCloudinary = async (
 
     const result = await uploadVideo(filePath);
     
-    console.log(result);
     fs.unlinkSync(filePath);
 
     let video;
-    if (result.duration > 60) {
+    if (result.duration > 45) {
       video = new Video({
         description,
         videoUrl: result.secure_url,
         publicId: result.public_id,
         duration: result.duration,
-        uid,
+        userId,
         profil,
         userName,
         title,
         category,
+        channelId,
+      
         
       });
       await video.save(); 
@@ -71,11 +73,12 @@ export const uploadVideoToCloudinary = async (
         videoUrl: result.secure_url,
         publicId: result.public_id,
         duration: result.duration,
-        uid,
+        userId,
         profil,
         title,
         userName,
         category,
+        channelId,
         isShort: true, 
       });
       await video.save(); 
@@ -99,6 +102,7 @@ export const uploadVideoToCloudinary = async (
 export const likeVideo = async (req: Request, res: Response) => {
   const { _id, uid } = req.body;
 
+  
   if (!_id || !uid) {
     res.status(400).json({ message: "User ID and Video ID are required" });
     return;
@@ -122,6 +126,7 @@ export const likeVideo = async (req: Request, res: Response) => {
         likes:video.likes
         
       });
+      
       return;
     }
 
